@@ -67,10 +67,15 @@ header{
     font-size: 60px;
 }
 
-h3{
+h3, h4 {
+    line-height: 150% !important;
+}
+
+body {
     line-height: 150% !important;
 }
 
 img {
     max-width: 100%;
+    margin-bottom: 50px;
 }
