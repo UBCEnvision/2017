@@ -59,7 +59,7 @@ header{
 
 #header-text{
     position: absolute;
-    bottom: 50%;
+    bottom: 30%;
     left: 10%;
 }
 
@@ -69,4 +69,8 @@ header{
 
 h3{
     line-height: 150% !important;
+}
+
+img {
+    max-width: 100%;
 }
