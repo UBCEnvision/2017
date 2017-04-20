@@ -156,7 +156,7 @@
                 <h4> Overall Reaction:
                     $$ 2Zn + O_2 \rightarrow 2ZnO; \quad E^0 = 1.65 V $$
                 </h4>
-                <h4><small>Ref: Wang, Xianyou, et al. "Studies on the oxygen reduction catalyst for zinc–air battery electrode." <i>Journal of power sources</i> 124.1 (2003): 278-284.</small></h4>
+                <h4><small>Ref: Wang, Xianyou, et al. "<a href="http://www.sciencedirect.com/science/article/pii/S0378775303007377" target="_blank">Studies on the oxygen reduction catalyst for zinc–air battery electrode.</a>" <i>Journal of power sources</i> 124.1 (2003): 278-284.</small></h4>
             </div>
             <div class="col-lg-6">
             <center>
@@ -169,15 +169,33 @@
             <div class="col-lg-12">
                 <h2>Recipe</h2>
                 <h3>Zinc powder, 6M potassium hydroxide solution, separator (or membrane, we use Viledon filter paper), <a href="http://www.gaskatel.de/eng/produkte/biplex/eng_biplex_index.html" target="_blank">Gaskatel MnO2</a> gas diffusion electrodes (GDE) (alternative: any oxygen reduction reaction cathodes).</h3>
-                <p>Procedures</p>
-                <ol>
-                    <li>Mix KOH solution with zinc powder to form a slurry.</li>
-                    <li>Immerse filter paper in KOH solution for ~5 minutes.</li>
-                    <li>Spread the zinc-KOH slurry onto the current collector (we use a nickel plate, alternative: stainless steel).</li>
-                    <li>Place the separator on top of the slurry.</li>
-                    <li>Place the Gaskatel GDE on top of the separator.</li>
-                    <li>Seal the cell and measure the open circuit potential.</li>
-                </ol>                
+                <div class="panel-group">
+                  <div class="panel panel-primary">
+                    <div class="panel-heading">
+                      <h4 class="panel-title">
+                        <a data-toggle="collapse" href="#procedures">
+                        <span class="glyphicon glyphicon-cutlery" aria-hidden="true"></span>
+                        
+                        See Procedures
+                        </a>
+                      </h4>
+                    </div>
+                    <div id="procedures" class="panel-collapse collapse">
+                      <div class="panel-body">
+                      <h4> 
+                        <ol>
+                        <li>Mix KOH solution with zinc powder to form a slurry.</li>
+                        <li>Immerse filter paper in KOH solution for ~5 minutes.</li>
+                        <li>Spread the zinc-KOH slurry onto the current collector (we use a nickel plate, alternative: stainless steel).</li>
+                        <li>Place the separator on top of the slurry.</li>
+                        <li>Place the Gaskatel GDE on top of the separator.</li>
+                        <li>Seal the cell and measure the open circuit potential.</li>
+                        </ol> 
+                      </h4>
+                      </div>
+                    </div>
+                  </div>              
+                </div>    
             </div>
 
             
@@ -209,13 +227,14 @@
                 <div class="col-lg-6">
                 <h1><b>Stopping Mechanism</b></h1>
                 <h3>We use an iodine clock (the peroxide version) as our stopping mechanism. </h3>
-                <h4>Two colorless solutions are mixed and a dark blue color appears after a certain $\Delta T$. In our Iodine Clock Tower, a laser shines through the solution, hitting a light-sensitive sensor on the other side. The formation of a dark blue color lowers the light intensity of the laser. The LDR sensors detect this change and the Arduino then cuts off the motor.
+                <h4>Two colorless solutions (we call them Solution $A$ and Solution $B$) are mixed and a dark blue color appears after a certain $\Delta T$. In our Iodine Clock Tower, a laser shines through the solution, hitting a light-sensitive sensor on the other side. The formation of a dark blue color lowers the light intensity of the laser. The LDR sensors detect this change and the Arduino then cuts off the motor.
                 </h4>
 
-                Read our blog article for more information: 
+                <h4><small>Read our blog article for more information: </small>
                 <a class="btn btn-default" target="_blank" href="http://www.ubcchemecar.com/blog/2017/01/27/iodine-clock/">
                 <span class="glyphicon glyphicon-share" aria-hidden="true"></span> Link
                 </a>
+                </h4>
                 <hr>
                 </div>
                 <div class="col-lg-6">
@@ -223,7 +242,7 @@
                     <img src="./images/algorithm.png">
                     <p>A finite state machine (FSM) representation of our algorithm</p>
                     <hr>
-                    <a class="btn btn-default" target="_blank" href="http://vaidehijoshi.github.io/blog/2015/03/17/a-machine-state-of-mind-part-1-understanding-state-machines/">
+                    <a class="btn btn-lg btn-primary" target="_blank" href="http://vaidehijoshi.github.io/blog/2015/03/17/a-machine-state-of-mind-part-1-understanding-state-machines/">
                     <span class="glyphicon glyphicon-share" aria-hidden="true"></span> Learn More
                     </a>
                     </center>
@@ -233,7 +252,7 @@
             <div class="col-lg-12">
                 <div class="col-lg-6">
                 <h2>Reaction Details</h2>
-
+                <h4>This reaction starts from a solution of hydrogen peroxide with sulfuric acid. To this is added a solution containing potassium iodide, sodium thiosulfate, and starch. There are two reactions occurring in the solution.</h4>
                 <div class="panel-group">
                   <div class="panel panel-primary">
                     <div class="panel-heading">
@@ -243,8 +262,9 @@
                     </div>
                     <div id="collapse1" class="panel-collapse collapse">
                       <div class="panel-body">
+                      <h4> In the slow reaction, iodine is produced from sulfuric acid and hydrogen peroxide.</h4>
                       <p> $$H_2O_2 + 2I^- + 2H^+ \rightarrow I_2 + 2H_2O$$ </p>
-                      <p> </p></div>
+                      </div>
                     </div>
                   </div>
                   <div class="panel panel-success">
@@ -254,10 +274,15 @@
                       </h4>
                     </div>
                     <div id="collapse2" class="panel-collapse collapse">
-                      <div class="panel-body"><p> $$2S_2O_3^{2-} + I_2 + 2H^+ \rightarrow S_4O_6^{2-} + 2I^-$$ </p></div>
+                      <div class="panel-body">
+                      <br>
+                      <h4>In the second, fast reaction, iodine is reconverted to 2 iodide ions by the thiosulfate. Once the thiosulfate ion has been exhausted, this reaction stops and the blue colour caused by the triiodide – starch complex appears.</h4>
+                      <p> $$2S_2O_3^{2-} + I_2 + 2H^+ \rightarrow S_4O_6^{2-} + 2I^-$$ </p>
+                      </div>
                     </div>
-                  </div>                  
-                </div>     
+                  </div>                 
+                </div>  
+                <h4><small>Ref: <a href="https://en.wikipedia.org/wiki/Iodine_clock_reaction">https://en.wikipedia.org/wiki/Iodine_clock_reaction</a></small></h4>                    
                 </div>  
                 <div class="col-lg-6">
                     <center><iframe src="https://giphy.com/embed/h5rQZ5wjmKWJy" width="480" height="269.76" frameBorder="0" class="giphy-embed" allowFullScreen></iframe><p><a href="https://giphy.com/gifs/chemistry-h5rQZ5wjmKWJy">via GIPHY</a></p></center>
@@ -271,7 +296,8 @@
         <footer>
             <div class="row">
                 <div class="col-lg-12">
-                    <p>Copyright &copy; UBC Chem-E-Car 2017 | Contact: captain@ubcchemecar.com</p>
+                    <h4>Copyright &copy; UBC Chem-E-Car 2017</h4> 
+                    <h4>Contact: <a href="mailto:captain@ubcchemecar.com">captain@ubcchemecar.com</a></h4>
                 </div>
             </div>
             <!-- /.row -->
