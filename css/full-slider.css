@@ -50,10 +50,10 @@ header{
 }
 
 .row{
-    margin-bottom: 50px;
+    margin-bottom: 80px;
 }
 
-.row h3{
+.row h3, h4{
     margin-bottom: 50px;
 }
 
@@ -68,11 +68,11 @@ header{
 }
 
 h3, h4 {
-    line-height: 150% !important;
+    line-height: 180% !important;
 }
 
 body {
-    line-height: 150% !important;
+    line-height: 180% !important;
 }
 
 img {
