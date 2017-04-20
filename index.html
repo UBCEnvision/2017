@@ -41,7 +41,7 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="http://www.ubcchemecar.com">UBC Chem-E-Car</a>
+                <a class="navbar-brand" href="http://www.ubcchemecar.com"><b>UBC Chem-E-Car</b></a>
             </div>
             <!-- Collect the nav links, forms, and other content for toggling -->
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
@@ -168,14 +168,14 @@
                       
             <div class="col-lg-12">
                 <h2>Recipe</h2>
-                <h3>Zinc powder, 6M potassium hydroxide solution, separator (or membrane, we use Viledon filter paper), <a href="http://www.gaskatel.de/eng/produkte/biplex/eng_biplex_index.html" target="_blank">Gaskatel MnO2</a> gas diffusion electrodes (GDE) (alternative: any oxygen reduction reaction cathodes).</h3>
+                <h3>Zinc powder, 6M potassium hydroxide solution, separator (or membrane, we use Viledon filter paper), <a href="http://www.gaskatel.de/eng/produkte/biplex/eng_biplex_index.html" target="_blank">Gaskatel MnO2</a> gas diffusion electrodes (GDE) (alternative: any ORR air cathodes).</h3>
                 <div class="panel-group">
                   <div class="panel panel-primary">
                     <div class="panel-heading">
                       <h4 class="panel-title">
                         <a data-toggle="collapse" href="#procedures">
                         <span class="glyphicon glyphicon-cutlery" aria-hidden="true"></span>
-                        
+
                         See Procedures
                         </a>
                       </h4>
@@ -190,7 +190,9 @@
                         <li>Place the separator on top of the slurry.</li>
                         <li>Place the Gaskatel GDE on top of the separator.</li>
                         <li>Seal the cell and measure the open circuit potential.</li>
-                        </ol> 
+                        </ol>
+                        <hr>
+                        <small>Further Reading (We simplified the procedures by not doing gelling): Mohamad, A. A. "<a href="http://www.sciencedirect.com/science/article/pii/S0378775305016691">Zn/gelled 6M KOH/O 2 zinc–air battery.</a>" Journal of power sources 159.1 (2006): 752-757. .</small> 
                       </h4>
                       </div>
                     </div>
@@ -239,20 +241,30 @@
                 </div>
                 <div class="col-lg-6">
                     <center>
-                    <img src="./images/algorithm.png">
-                    <p>A finite state machine (FSM) representation of our algorithm</p>
-                    <hr>
-                    <a class="btn btn-lg btn-primary" target="_blank" href="http://vaidehijoshi.github.io/blog/2015/03/17/a-machine-state-of-mind-part-1-understanding-state-machines/">
-                    <span class="glyphicon glyphicon-share" aria-hidden="true"></span> Learn More
-                    </a>
+                        <img src="./images/stopping.png">
                     </center>
+                </div>
+                <div class="col-lg-12">
+                    <center>
+                    <img src="./images/algorithm.png" width=80%>
+                    </center>
+
+                    <h4><small>A finite state machine (FSM) representation of our algorithm. We first check if the LDR reading is at a pre-defined 'normal' range, i.e. the background value when the solution is colorless, if the value is incorrect the algorithm flashes an LED to notify the car operator. Once the start button is pressed, we release a valve to allow solution $A$ and $B$ to mix and activate the motor. We continuously check the LDR reading, if it passes a pre-defined threshold 10 times that means a color change has occured, which triggers the motor to deactivate. We use 10x as a safeguard to prevent accidental triggers by for example, sensor errors or impurities in the solution. </small></h4>
+
+                    <h4><small>Learn More: </small> 
+                    <a class="btn btn-primary" target="_blank" href="http://vaidehijoshi.github.io/blog/2015/03/17/a-machine-state-of-mind-part-1-understanding-state-machines/">
+                    <span class="glyphicon glyphicon-share" aria-hidden="true"></span> Finite State Machines
+                    </a>
+                    </h4>
+                    <hr>
+                    
                 </div>
             </div>
 
             <div class="col-lg-12">
                 <div class="col-lg-6">
                 <h2>Reaction Details</h2>
-                <h4>This reaction starts from a solution of hydrogen peroxide with sulfuric acid. To this is added a solution containing potassium iodide, sodium thiosulfate, and starch. There are two reactions occurring in the solution.</h4>
+                <h4>This reaction starts from Solution $A$, a mixture of hydrogen peroxide with sulfuric acid. A separate solution, Solution $B$ containing potassium iodide, sodium thiosulfate, and starch is then added to solution $A$.</h4>
                 <div class="panel-group">
                   <div class="panel panel-primary">
                     <div class="panel-heading">
@@ -296,8 +308,7 @@
         <footer>
             <div class="row">
                 <div class="col-lg-12">
-                    <h4>Copyright &copy; UBC Chem-E-Car 2017</h4> 
-                    <h4>Contact: <a href="mailto:captain@ubcchemecar.com">captain@ubcchemecar.com</a></h4>
+                    <h4>Copyright &copy; <a target="_blank" href="http://www.ubcchemecar.com">UBC Chem-E-Car 2017</a> $\cdot$ Contact: <a href="mailto:captain@ubcchemecar.com">captain@ubcchemecar.com</a></h4>
                 </div>
             </div>
             <!-- /.row -->
