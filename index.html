@@ -84,10 +84,11 @@
         </div>
 
         <div id="header-text">
-            <h1><b><strong>The Patri-Car-Key</strong><b></h1>
-            <h2>Designed in UBC, Vancouver</h2>
+            <h1><b><strong>The Patri•Car•Key</strong><b></h1>
+            <h2>Designed in Vancouver, BC</h2>
             <hr>
-            <h4>AIChE Pacific Northwest Regionals 2017</h4>
+            <h3>Made in China</h3>
+            <!-- <h4>AIChE Pacific Northwest Regionals 2017</h4> -->
         </div>
 
     </header>
@@ -97,8 +98,8 @@
 
         <div class="row">
             <div class="col-lg-6">
-                <h1><b>The Patri-Car-Key</b></h1>
-                <h3>The Patri-Car-Key is a zinc-air powered vehicle that uses an iodine clock timing reaction. The vehicle is actuated with an Arduino controller that has custom electronics and an algorithm designed to reduce operational errors. <b>Safe operation</b> is emphasized in the design features.</h3>
+                <h1><b>The Patri•Car•Key</b></h1>
+                <h3>The Patri•Car•Key is a zinc-air powered vehicle that uses an iodine clock timing reaction. The vehicle is actuated with an Arduino controller that has custom electronics and an algorithm designed to reduce operational errors. <b>Safe operation</b> is emphasized in the design features.</h3>
 
                 <a class="btn btn-lg btn-primary" target="_blank" href="./images/poster.pdf">
                 <span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span> View Poster
@@ -136,19 +137,22 @@
         </div>
 
         <div class="row" id="power_source">
-            <div class="col-lg-12">
+            <div class="col-lg-6">
+                <center><img src="./images/battery_model.png" height="450px"></center>
+            </div>
+            <div class="col-lg-6">
                 <h1><b>Power Source</b></h1>
                 <h3>The motor runs on six zinc-air batteries in series. Oxidation of zinc on the anode releases electrons which pass through an external circuit and travel to the cathode where oxygen is reduced to hydroxide ions. </h3>
-            </div>
+            </div>            
         </div>
         <div class="row">
             <div class="col-lg-6">
                 <h2>Electrochemistry</h2>
                 <hr>
-                <h4> Positive Electrode:
+                <h4> Cathode (Reduction of Oxygen):
                     $$ O_2 + 2H_2O + 4e^- \rightarrow 4OH^-; \quad E^0 = 0.40 V $$
                 </h4>
-                <h4> Negative Electrode:
+                <h4> Anode (Oxidation of Zinc):
                     $$ 2Zn \rightarrow 2Zn^{2+} + 4e^- $$
                     $$ 2Zn^{2+} + 4OH^{-} \rightarrow 2Zn(OH)_2; \quad E^0 = 1.25 V $$
                     $$ 2Zn(OH)_2 \rightarrow 2ZnO + 2H_2O $$
@@ -156,12 +160,15 @@
                 <h4> Overall Reaction:
                     $$ 2Zn + O_2 \rightarrow 2ZnO; \quad E^0 = 1.65 V $$
                 </h4>
-                <h4><small>Ref: Wang, Xianyou, et al. "<a href="http://www.sciencedirect.com/science/article/pii/S0378775303007377" target="_blank">Studies on the oxygen reduction catalyst for zinc–air battery electrode.</a>" <i>Journal of power sources</i> 124.1 (2003): 278-284.</small></h4>
             </div>
             <div class="col-lg-6">
             <center>
             <iframe src="https://giphy.com/embed/qoTv0ypuGYTok" width="480" height="360" frameBorder="0" class="giphy-embed" allowFullScreen></iframe><p><a href="https://giphy.com/gifs/air-qoTv0ypuGYTok">via GIPHY</a></p>
             </center>
+            <h4><small>Wang, Xianyou, et al. "<a href="http://www.sciencedirect.com/science/article/pii/S0378775303007377" target="_blank">Studies on the oxygen reduction catalyst for zinc–air battery electrode.</a>" <i>Journal of power sources</i> 124.1 (2003): 278-284.</small></h4>
+
+            <h4><small>The oxygen reduction reaction (ORR) can proceed through a 2-electron pathway or a more efficient 4-electron pathway depending on the cathode used. Further reading: Nørskov, Jens Kehlet, et al. "<a href="http://pubs.acs.org/doi/abs/10.1021/jp047349j">Origin of the overpotential for oxygen reduction at a fuel-cell cathode.</a>"
+            <i>The Journal of Physical Chemistry B 108.46 (2004): 17886-17892.</i></small></h4>
             </div>  
         </div>
         <div class="row">
