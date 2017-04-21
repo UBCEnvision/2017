@@ -18,7 +18,7 @@
     <link href="css/full-slider.css" rel="stylesheet">
 
     <link href="https://fonts.googleapis.com/css?family=Rubik" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.11.0/styles/atom-one-dark.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.11.0/styles/tomorrow-night-bright.min.css">
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -233,188 +233,217 @@
                 <h2>Arduino Code</h2>
                 <pre>
                 <code class="cpp">
-//Ngai To Lo, Thanos Kritharis
-/* Nationals 2016 Build 1.0 
+// Ngai To Lo, Thanos Kritharis
+// Build 1.5 Refactor: Siang Lim
+
+/* Regionals 2017 Build 1.5
 /* sensor design is LDR */
 /* valve control is solenoid valve*/
-//initiating digital pins
-#define ENCODERTEETH 10
-#define WHEELDIAMETER 10
-#define SECOND 1000
-//#define LDRREF 300
 
-int ldrRef = 989;//Reference value for sensor
-int encoderSensor = 2; //Pin used to measure optosensor input 
-int startButton = 7; //Pin used to control startup (Input)
-int onLight = 8;//Pin used to turn on button led
-int motor = 10; //Pin used to control motor
-int laser = 6; //Pin used to control laser
-int mixer = 11; //Pin used to control mixer motor
-int valve = 12; //Pin used to control valve 
+//initiating digital pins
+#define WHEELDIAMETER 152           // Actual wheel (not encoder wheel) diameter in mm
+#define ENCODERRESOLUTION 24        // Number of teeth on the encoder wheel
+#define DARKPOINTSTHRESHOLD 100     // Threshold for number of dark points for triggering the clock
+#define REPORTTIME 5000             // Interval to print values to mobile app
+#define MIXERSPEED 144              // Equation is V=(X/256)*5, where X is a value between 1-256 (How fast the mixer spins)
+#define DLDR 60                     // Clock sensitivity: Change in reference value required to trigger clock
+
+int ldrRef = 990;       //Reference value average
+int ldrRefl = 985;      //Reference value for sensor lower
+int ldrRefu = 995;      //Reference vallue for sensor upper
+int encoderSensor = 2;  //Pin used to measure optosensor input 
+int startButton = 7;    //Pin used to control startup (Input)
+int onLight = 8;        //Pin used to turn on button led
+int motor = 10;         //Pin used to control motor
+int laser = 6;          //Pin used to control laser
+int mixer = 11;         //Pin used to control mixer motor
+int valve = 12;         //Pin used to control valve
+
+// New function to count the number of outliers
+int darkPointsCounter = 0; 
+bool clockFlag = true; // Flag for turning the clock on/off
 
 //Initiating analog pins
 int LDR = A0; //Pin used to measure phototransistor (Analog)
 
-//Creating values
+//Variables for when the car is running
 bool switchOn = false; //Create boolean to check if circuit is switched on or not
-bool shutDown;//bool for status to shut down system
+bool shutDown = false;//bool for status to shut down system
 int optoVal ; //Create optoVal
 int switchVal = 0;//Create default value for switch pin (input)
+int count;
+double distance;
+int encoderRef;
 
 //functions
-void startCar();
+void checkOnSwitch();
 void startClock(double ldrVal);
-void stopCar(double distance);
-unsigned long int getTime(unsigned long int  startTime);
+bool clockAboveThreshold(int ldrRef);
 
 //Assigning pins inputs/outputs
 void setup(){   
-      pinMode(encoderSensor,INPUT);
-      pinMode(startButton,INPUT); //set start in pin to input
-      pinMode(onLight,OUTPUT);
-      pinMode(motor,OUTPUT); //set motor pin to output
-      digitalWrite(motor,LOW); //set motor
-      pinMode(laser,OUTPUT); //set start out pin to output
-      digitalWrite(laser,HIGH);//keep laser on
-      pinMode(mixer,OUTPUT); //set mixer pin to output
-      digitalWrite(mixer,LOW); //set mixer pin to off
-      pinMode(valve, OUTPUT);      
-      Serial.begin(9600);//begin communication with serial monitor
-       //inform user program is initialized
+    pinMode(encoderSensor,INPUT);
+    pinMode(startButton,INPUT); //set start in pin to input
+    pinMode(onLight,OUTPUT);
+    pinMode(motor,OUTPUT); //set motor pin to output
+    digitalWrite(motor,LOW); //set motor
+    pinMode(laser,OUTPUT); //set start out pin to output
+    digitalWrite(laser,HIGH);//keep laser on
+    pinMode(mixer,OUTPUT); //set mixer pin to output
+    digitalWrite(mixer,LOW); //set mixer pin to off
+    pinMode(valve, OUTPUT);      
+    Serial.begin(9600);//begin communication with serial monitor
 }
-//end of setup
 
-//begin void loop
+// Void loop
 void loop (){
-  int ldrVal = analogRead(LDR);//Prevent car from starting until ref value is read
-  while(ldrVal != ldrRef){ //Blink light every 100 ms to indicate to user that value is not at reference
-    digitalWrite(onLight,HIGH);
-    delay(100);
-    digitalWrite(onLight,LOW);
-    delay(100);
-    ldrVal = analogRead(LDR); //read ldr value
-    Serial.println(ldrVal); // print ldr value onto terminal
-    Serial.println(digitalRead(startButton));// print button status
-    if (digitalRead(startButton) != 0){//hold button for 10 seconds to reset LED REF value
-      digitalWrite(onLight,HIGH);
-      long resetTimeRef = millis();//begin countdown to reset
-      while(startButton != 0){
-        long timeElapsed = millis() - resetTimeRef;
-        if (timeElapsed > 10000){
-          ldrRef = analogRead(LDR); //reset ref value
-          digitalWrite(onLight,LOW);
+    int ldrVal = analogRead(LDR);//Prevent car from starting until ref value is read
+
+    ///////////////////////////////////////////////
+    // This block is for flashing LEDs
+    ///////////////////////////////////////////////
+    while(ldrVal < ldrRefl || ldrVal > ldrRefu){ //Blink light every 100 ms to indicate to user that value is not at reference
+        digitalWrite(onLight,HIGH);
+        delay(100);
+        digitalWrite(onLight,LOW);
+        delay(100);
+        ldrVal = analogRead(LDR); //read ldr value
+        if (digitalRead(startButton) != 0){//hold button for 10 seconds to reset LED REF value
+          digitalWrite(onLight,HIGH);
+          long resetTimeRef = millis(); //begin countdown to reset
+          while(startButton != 0){
+            long timeElapsed = millis() - resetTimeRef;
+            if (timeElapsed > 10000){
+              ldrRef = analogRead(LDR); //reset ref value
+              digitalWrite(onLight,LOW);
+            }
+          }
         }
-      }
+    }
+
+    delay(300);
+    Serial.println("LDR at reference. \n");
+
+    ///////////////////////////////////////////////
+    // Car check on/off switch here
+    ///////////////////////////////////////////////
+    // This function keeps looping until we turn the switch on.
+    checkOnSwitch(); 
+
+    // Initialize encoder and time counter variables
+    shutDown = false;
+    count = 0;
+    distance = 0;
+    darkPointsCounter = 0;
+    // Check initial encoder wheel position
+    int encoderRef = digitalRead(encoderSensor);
+    delay(50);
+
+    // Start the total time timer before the 5 second delay
+    long totalTimeInit = millis();
+    long totalTime;
+
+    // Start checking clock
+    // open valve, and mixer; wait 5 seconds for fluid to pass into reactor, 
+    // then begin the motor.
+    digitalWrite(valve, HIGH);
+    analogWrite(mixer, MIXERSPEED);
+    delay(5000);
+    digitalWrite(valve,LOW);
+    digitalWrite(motor,HIGH);
+
+    ///////////////////////////////////////////////
+    // INITIALIZE APP TIMER VARIABLES
+    ///////////////////////////////////////////////
+
+    // Start the car runtime timer after the 5 second delay
+    long carTimeInit = millis();
+    long carTime;
+    bool encoderFlag;
+
+    // While LDR value is above threshold
+    while (clockAboveThreshold(ldrRef) || digitalRead(startButton) == true){
+        carTime = millis() - carTimeInit; // Count car time elapsed in millisecs
+
+        // Report values every 5 seconds
+        if (carTime % REPORTTIME == 0){
+            Serial.print("LDR: %.2f \n", analogRead(LDR));
+            Serial.print("Time (s): %.2f \n", carTime);
+        }
+
+        // Check if encoder position has changed
+        // Reference is the initial encoder value (either dark or light, or 1 or 0)
+        if(digitalRead(encoderSensor) != encoderRef){
+            count++;
+            encoderRef = digitalRead(encoderSensor);
+        }
+    }
+
+    ///////////////////////////////////////////////////////
+    // Once the clock is triggered, or button pressed
+    // Report final values and turn of motor and mixer
+    ///////////////////////////////////////////////////////
+
+    // Calculate total time (which is before the 5 second delay for the motor)
+    totalTime = millis() - totalTimeInit;
+
+    // Turn off the motor
+    digitalWrite(motor, LOW);
+    analogWrite(mixer, 0);
+    digitalWrite(onLight,LOW);
+
+    // Calculate the distance
+    distance = (count/24.0)*WHEELDIAMETER;
+
+    // Print out 2 timers, before and after delay
+    Serial.println("LDR Value: %.2f \n", analogRead(LDR));
+    Serial.println("Distance: %.2f \n", distance);
+    Serial.println("Car time: %.2f \n", carTime);
+    Serial.println("Total time: %.2f \n", totalTime);
+    switchOn = false;
+    delay(2000);
+}
+
+// This function checks the start button.
+// It stays in loop while the user holds down the 
+// button and only progresses once the user lets go of the button
+void checkOnSwitch(){ 
+  while(!switchOn){ // While pin reads 0
+    switchVal = digitalRead(startButton);   // read the start button
+    if (switchVal){
+        switchOn=true;
+        digitalWrite(onLight, HIGH);
     }
   }
-  startCar();
-  Serial.println("the Car has started ");
-  bool shutDown = false;
-  unsigned long startTime = millis();
-  int count = 0;
-  double distance =0;
-  
-  int encoderRef = digitalRead(encoderSensor);
-  //digitalWrite(laser,HIGH);
-  delay(50);
-  //double ldrVal = analogRead(LDR);
-  
-  startClock();
-  //delay(500);
-  //stopCar(distance,startTime);
-  //Serial.println("car was stopped because of ldr");
-  //Serial.println(analogRead(LDR));
-  //Serial.println(ldrVal);
-  //begin LDR Loop 
-  while (shutDown == false){
-     Serial.println("car is going!");
-//   Serial.println(analogRead(LDR));
-//   Serial.print(ldrRef);
-     shutDown = checkClock(ldrRef);
-     //begin encoder loops
-     while(digitalRead(encoderSensor) < encoderRef || digitalRead(encoderSensor) >encoderRef ){ 
-       if ( analogRead(LDR)  < (ldrRef-300) || shutDown == true){
-         shutDown = true;//shutdown system
-         stopCar(distance,startTime);
-         break;//break out of loop
-       }
-       shutDown = checkClock(ldrRef);             
-       if(digitalRead(encoderSensor) > encoderRef || digitalRead(encoderSensor) < encoderRef){
-         count ++;
-         if(count ==ENCODERTEETH){        
-           distance = distance + WHEELDIAMETER;//log distance!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! you will have to find out the arc length of the encoder wheel 
-           count=1;
-         }
-          break;//break out of loop
-        }
-        shutDown = checkClock(ldrRef);    
-      } 
-    } 
-    stopCar(distance,startTime);     
-    //end sensor loop
-}
-
-// This function is the start button, it stays in loop while the user holds down the 
-// button and only progresses once the user lets go of the button
-void startCar(){
-  delay(300);
-  Serial.println("initialization done"); 
-  
-  do{
-      switchVal = digitalRead(startButton);
-      if (switchVal){
-        switchOn=true;
-      }
-  } while (switchOn == false);
-  digitalWrite(onLight, HIGH);
-  do{
-      digitalRead(startButton);
-      Serial.println("stuck");
-  } while (digitalRead(startButton));
-}
-
-// open valve, and mixer; wait 5 seconds for fluid to pass into reactor, then begin the motor.
-void startClock(){
-  digitalWrite(valve, HIGH);
-  analogWrite(mixer, 144);
-  delay(5000);
-  digitalWrite(valve,LOW);
-  digitalWrite(motor, HIGH);
-  
-  
-}
-//Shutdown function stops car resets the switchOn value
-//and sends data to bluetooth module via serial
-void stopCar(double distance,unsigned long int startTime){
-  unsigned long int currentTime = millis();
-  unsigned long int totalTime = currentTime - startTime;
-  digitalWrite(motor, LOW);
-  analogWrite(mixer, 0);
-  //digitalWrite(valve, LOW);
-  //1digitalWrite(laser,LOW);
-  digitalWrite(onLight,LOW);
-  
-  Serial.println("distance is:");
-  Serial.println(distance);
-  Serial.println("Time is:");
-  Serial.println(totalTime);
-  switchOn =false;
-  delay(2000);
-}
-
-unsigned long int getTime(unsigned long int startTime){
-return (millis()-startTime);
-}
-
-//check clock if below ref value shut off car
-bool checkClock(int ldrRef){
-  if (analogRead (LDR) < (ldrRef-300)|| digitalRead(startButton)==true){
-     switchOn =false;
-     return true;
-  } 
-  else{
-     return false;
+ 
+  // Keep reading until the switch value is 0 again...
+  // Because we don't want the car to start until we let go of the button
+  while (switchVal){
+    switchVal = digitalRead(startButton);
   }
+
+  Serial.println("The car is on. \n");
+}
+
+
+// Check clock if below ref value shut off car
+bool clockAboveThreshold(int ldrRef){
+    // This function would return true by default if the clock is not triggered
+    clockFlag = true;
+
+    // If the LDR value is below the threshold
+    // Increment a counter, counting the amount of points below the threshold
+    if (analogRead (LDR) < (ldrRef-DLDR)){
+        darkPointsCounter = darkPointsCounter + 1;
+    }
+
+    // If the number of points below the threshold is above 100 (for example)
+    // Set clock to triggered and return this value
+    if(darkPointsCounter > DARKPOINTSTHRESHOLD){
+        clockFlag = false;
+    }
+
+    return clockFlag;
 }
                 </code>
                 </pre>
