@@ -18,6 +18,7 @@
     <link href="css/full-slider.css" rel="stylesheet">
 
     <link href="https://fonts.googleapis.com/css?family=Rubik" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.11.0/styles/atom-one-dark.min.css">
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -87,8 +88,8 @@
             <h1><b><strong>The Patri•Car•Key</strong><b></h1>
             <h2>Designed in Vancouver, BC</h2>
             <hr>
-            <h3>Made in China</h3>
-            <!-- <h4>AIChE Pacific Northwest Regionals 2017</h4> -->
+            <!-- <h3>AIChE Pacific Northwest</h3> -->
+            <h4>AIChE Pacific Northwest Regionals 2017</h4>
         </div>
 
     </header>
@@ -109,6 +110,8 @@
                 <span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span> Poster Template (Editable)
                 </a>
 
+                <h4><small> Required fonts for template: <a href="http://www.fontfabric.com/hero-free-font/">Hero</a>, <a href="http://www.dafont.com/lane.font">Lane Narrow</a></small></h4>
+
             </div>
             <div class="col-lg-6">
                 <center><img src="./images/car_full.png"></center>
@@ -125,6 +128,7 @@
                 <h3>Integrated water tank for even weight distribution. Secure suspension ensure consistent steering. High-traction wheels prevent slipping.</h3>
             </div>
         </div>
+
         <div class="row">
             <div class="col-lg-6">
                 <h2><b>Frame</b></h2>
@@ -133,7 +137,6 @@
             <div class="col-lg-6">
                 <center><img src="./images/frame.png" width="100%"></center>
             </div>                            
-
         </div>
 
         <div class="row" id="power_source">
@@ -199,7 +202,7 @@
                         <li>Seal the cell and measure the open circuit potential.</li>
                         </ol>
                         <hr>
-                        <small>Further Reading (We simplified the procedures by not doing gelling): Mohamad, A. A. "<a href="http://www.sciencedirect.com/science/article/pii/S0378775305016691">Zn/gelled 6M KOH/O 2 zinc–air battery.</a>" Journal of power sources 159.1 (2006): 752-757. .</small> 
+                        <small>Further Reading (we simplified our procedures by not doing gelling): <br> Mohamad, A. A. "<a href="http://www.sciencedirect.com/science/article/pii/S0378775305016691">Zn/gelled 6M KOH/O 2 zinc–air battery.</a>" <i>Journal of power sources</i> 159.1 (2006): 752-757. .</small> 
                       </h4>
                       </div>
                     </div>
@@ -222,12 +225,203 @@
         </div>
 
         <div class="row" id="electrical">
+            <div class="col-lg-12">
+                <h1><b>Electrical</b></h1>
+                <h3>An Arduino microcontroller is the brain of the car. The Arduino collects sensor readings, performs calculations, drives the motor and transmits test data via Bluetooth.</h3>
+            </div>
             <div class="col-lg-6">
-                <center><img src="./images/electrical.png"></center>
+                <h2>Arduino Code</h2>
+                <pre>
+                <code class="cpp">
+//Ngai To Lo, Thanos Kritharis
+/* Nationals 2016 Build 1.0 
+/* sensor design is LDR */
+/* valve control is solenoid valve*/
+//initiating digital pins
+#define ENCODERTEETH 10
+#define WHEELDIAMETER 10
+#define SECOND 1000
+//#define LDRREF 300
+
+int ldrRef = 989;//Reference value for sensor
+int encoderSensor = 2; //Pin used to measure optosensor input 
+int startButton = 7; //Pin used to control startup (Input)
+int onLight = 8;//Pin used to turn on button led
+int motor = 10; //Pin used to control motor
+int laser = 6; //Pin used to control laser
+int mixer = 11; //Pin used to control mixer motor
+int valve = 12; //Pin used to control valve 
+
+//Initiating analog pins
+int LDR = A0; //Pin used to measure phototransistor (Analog)
+
+//Creating values
+bool switchOn = false; //Create boolean to check if circuit is switched on or not
+bool shutDown;//bool for status to shut down system
+int optoVal ; //Create optoVal
+int switchVal = 0;//Create default value for switch pin (input)
+
+//functions
+void startCar();
+void startClock(double ldrVal);
+void stopCar(double distance);
+unsigned long int getTime(unsigned long int  startTime);
+
+//Assigning pins inputs/outputs
+void setup(){   
+      pinMode(encoderSensor,INPUT);
+      pinMode(startButton,INPUT); //set start in pin to input
+      pinMode(onLight,OUTPUT);
+      pinMode(motor,OUTPUT); //set motor pin to output
+      digitalWrite(motor,LOW); //set motor
+      pinMode(laser,OUTPUT); //set start out pin to output
+      digitalWrite(laser,HIGH);//keep laser on
+      pinMode(mixer,OUTPUT); //set mixer pin to output
+      digitalWrite(mixer,LOW); //set mixer pin to off
+      pinMode(valve, OUTPUT);      
+      Serial.begin(9600);//begin communication with serial monitor
+       //inform user program is initialized
+}
+//end of setup
+
+//begin void loop
+void loop (){
+  int ldrVal = analogRead(LDR);//Prevent car from starting until ref value is read
+  while(ldrVal != ldrRef){ //Blink light every 100 ms to indicate to user that value is not at reference
+    digitalWrite(onLight,HIGH);
+    delay(100);
+    digitalWrite(onLight,LOW);
+    delay(100);
+    ldrVal = analogRead(LDR); //read ldr value
+    Serial.println(ldrVal); // print ldr value onto terminal
+    Serial.println(digitalRead(startButton));// print button status
+    if (digitalRead(startButton) != 0){//hold button for 10 seconds to reset LED REF value
+      digitalWrite(onLight,HIGH);
+      long resetTimeRef = millis();//begin countdown to reset
+      while(startButton != 0){
+        long timeElapsed = millis() - resetTimeRef;
+        if (timeElapsed > 10000){
+          ldrRef = analogRead(LDR); //reset ref value
+          digitalWrite(onLight,LOW);
+        }
+      }
+    }
+  }
+  startCar();
+  Serial.println("the Car has started ");
+  bool shutDown = false;
+  unsigned long startTime = millis();
+  int count = 0;
+  double distance =0;
+  
+  int encoderRef = digitalRead(encoderSensor);
+  //digitalWrite(laser,HIGH);
+  delay(50);
+  //double ldrVal = analogRead(LDR);
+  
+  startClock();
+  //delay(500);
+  //stopCar(distance,startTime);
+  //Serial.println("car was stopped because of ldr");
+  //Serial.println(analogRead(LDR));
+  //Serial.println(ldrVal);
+  //begin LDR Loop 
+  while (shutDown == false){
+     Serial.println("car is going!");
+//   Serial.println(analogRead(LDR));
+//   Serial.print(ldrRef);
+     shutDown = checkClock(ldrRef);
+     //begin encoder loops
+     while(digitalRead(encoderSensor) < encoderRef || digitalRead(encoderSensor) >encoderRef ){ 
+       if ( analogRead(LDR)  < (ldrRef-300) || shutDown == true){
+         shutDown = true;//shutdown system
+         stopCar(distance,startTime);
+         break;//break out of loop
+       }
+       shutDown = checkClock(ldrRef);             
+       if(digitalRead(encoderSensor) > encoderRef || digitalRead(encoderSensor) < encoderRef){
+         count ++;
+         if(count ==ENCODERTEETH){        
+           distance = distance + WHEELDIAMETER;//log distance!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! you will have to find out the arc length of the encoder wheel 
+           count=1;
+         }
+          break;//break out of loop
+        }
+        shutDown = checkClock(ldrRef);    
+      } 
+    } 
+    stopCar(distance,startTime);     
+    //end sensor loop
+}
+
+// This function is the start button, it stays in loop while the user holds down the 
+// button and only progresses once the user lets go of the button
+void startCar(){
+  delay(300);
+  Serial.println("initialization done"); 
+  
+  do{
+      switchVal = digitalRead(startButton);
+      if (switchVal){
+        switchOn=true;
+      }
+  } while (switchOn == false);
+  digitalWrite(onLight, HIGH);
+  do{
+      digitalRead(startButton);
+      Serial.println("stuck");
+  } while (digitalRead(startButton));
+}
+
+// open valve, and mixer; wait 5 seconds for fluid to pass into reactor, then begin the motor.
+void startClock(){
+  digitalWrite(valve, HIGH);
+  analogWrite(mixer, 144);
+  delay(5000);
+  digitalWrite(valve,LOW);
+  digitalWrite(motor, HIGH);
+  
+  
+}
+//Shutdown function stops car resets the switchOn value
+//and sends data to bluetooth module via serial
+void stopCar(double distance,unsigned long int startTime){
+  unsigned long int currentTime = millis();
+  unsigned long int totalTime = currentTime - startTime;
+  digitalWrite(motor, LOW);
+  analogWrite(mixer, 0);
+  //digitalWrite(valve, LOW);
+  //1digitalWrite(laser,LOW);
+  digitalWrite(onLight,LOW);
+  
+  Serial.println("distance is:");
+  Serial.println(distance);
+  Serial.println("Time is:");
+  Serial.println(totalTime);
+  switchOn =false;
+  delay(2000);
+}
+
+unsigned long int getTime(unsigned long int startTime){
+return (millis()-startTime);
+}
+
+//check clock if below ref value shut off car
+bool checkClock(int ldrRef){
+  if (analogRead (LDR) < (ldrRef-300)|| digitalRead(startButton)==true){
+     switchOn =false;
+     return true;
+  } 
+  else{
+     return false;
+  }
+}
+                </code>
+                </pre>
             </div>        
             <div class="col-lg-6">
-                <h1><b>Electrical</b></h1>
-                <h3>An Arduino microcontroller is the brain of the car. It collects sensor readings, performs calculations, drives motors and transmits data.</h3>
+                <h2>Circuit Diagram</h2>
+                <center><img src="./images/electrical.png"></center>
             </div>
         </div>
 
@@ -349,6 +543,10 @@
       ga('create', 'UA-63367875-1', 'auto');
       ga('send', 'pageview');
     </script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.11.0/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
 
 </body>
 
